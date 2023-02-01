@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Data.SqlClient;
 using System.Data;
+using System.Data.SqlClient;
 
 namespace ADODZ2
 {
@@ -12,7 +8,8 @@ namespace ADODZ2
     {
         static void Main(string[] args)
         {
-            try { 
+            try
+            {
                 DataSet setCounter = new DataSet();
                 DataSet setProduct = new DataSet();
                 SqlDataAdapter adapterCounter = new SqlDataAdapter("SELECT * FROM Counter;", "Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Storage;Integrated Security=True;");
@@ -39,16 +36,40 @@ namespace ADODZ2
                 //setCounter.Tables[0].Rows.Add(3,"МногоСтали",30,DateTime.Now);
                 //adapterCounter.Update(setCounter);
 
-                for (int i = 4; i < 100; i++)
+                /*for (int i = 4; i < 100; i++)
                 {
-                    setCounter.Tables[0].Rows.Add(i, "Много пластика", 40,DateTime.Now);
+                    setCounter.Tables[0].Rows.Add(i, "Много пластика", 40, DateTime.Now);
                 }
-                adapterCounter.Update(setCounter);
+                adapterCounter.Update(setCounter);*/
+                int maxcount = 0;
+                int mincount = Int32.MaxValue;
+                string counterName = "";
+                string counterName2 = "";
+                foreach (DataRow dr in setCounter.Tables[0].Rows)
+                {
+                    if (dr.Field<int>("Count") > maxcount)
+                    {
+                        maxcount = dr.Field<int>("Count");
+                        counterName = dr.Field<string>("CounterName");
+                    }
+                    if (dr.Field<int>("Count") < mincount)
+                    {
+                        mincount = dr.Field<int>("Count");
+                        counterName2 = dr.Field<string>("CounterName");
+                    }
+                }
+                Console.WriteLine(counterName + " : " + maxcount + "tovarov");
+                Console.WriteLine(counterName2 + " : " + mincount + "tovarov");
+
+                DataViewManager dvm = new DataViewManager(setCounter);
+                DataView dv = dvm.CreateDataView(setCounter.Tables[0]);
+                dv.RowFilter = "Count = MAX(Count)";
+                Console.WriteLine(dv.Count);
 
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);  
+                Console.WriteLine(ex.Message);
             }
 
             Console.ReadLine();
